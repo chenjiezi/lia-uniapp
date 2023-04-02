@@ -7,12 +7,25 @@ const toast = ref<{ showToast: (options?: ToastOptions) => {} }>()
 const showToast = (options: ToastOptions) => {
   toast.value!.showToast(options)
 }
-const { deviceList, initBlueTooth, startDeviceDiscovery, stopDeviceDiscovery, onNewDeviceFound, getBluetoothAdapterState } = useIndex(showToast)
+
+const {
+  deviceList,
+  initBlueTooth,
+  startDeviceDiscovery,
+  stopDeviceDiscovery,
+  onNewDeviceFound,
+  getBluetoothAdapterState,
+  onBluetoothAdapterStateChange,
+  closeBluetoothAdapter,
+} = useIndex(showToast)
 
 // 寻找周边的新设备
 onNewDeviceFound((res) => {
   deviceList.value.unshift(...res.devices)
 })
+
+// 监听蓝牙适配器状态变化
+// onBluetoothAdapterStateChange()
 </script>
 
 <template>
@@ -23,7 +36,7 @@ onNewDeviceFound((res) => {
         :cc="['block', 'bg-gradient-to-r', 'from-indigo-500', 'to-pink-500', 'border-none', 'mb-24rpx']"
         @click="initBlueTooth"
       >
-        蓝牙模块初始化
+        开启蓝牙模块初
       </AButton>
       <AButton
         :cc="['block', 'bg-gradient-to-r', 'from-indigo-500', 'to-pink-500', 'border-none', 'mb-24rpx']"
@@ -44,6 +57,12 @@ onNewDeviceFound((res) => {
         @click="getBluetoothAdapterState"
       >
         获取本机蓝牙适配器状态
+      </AButton>
+      <AButton
+        :cc="['block', 'bg-gradient-to-r', 'from-indigo-500', 'to-pink-500', 'border-none', 'mb-24rpx']"
+        @click="closeBluetoothAdapter"
+      >
+        关闭蓝牙模块
       </AButton>
     </div>
   </UBasePage>
