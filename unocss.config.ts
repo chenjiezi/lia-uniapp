@@ -1,22 +1,38 @@
-import { defineConfig, presetIcons } from 'unocss'
-// unocss-applet https://github.com/unocss-applet/unocss-applet
-import { presetApplet, presetRemRpx, transformerApplet } from 'unocss-applet'
+import {
+  defineConfig,
+  presetAttributify,
+  presetIcons,
+  transformerDirectives,
+  transformerVariantGroup,
+} from 'unocss'
+
+import {
+  presetApplet,
+  presetRemRpx,
+  transformerApplet,
+  transformerAttributify,
+} from 'unocss-applet'
+
 import { presetAno } from 'ano-ui'
 
 export default defineConfig({
   presets: [
-    presetApplet(),
-    presetRemRpx(),
     presetIcons({
-      scale: 1.2,
+      warn: true,
       extraProperties: {
         'display': 'inline-block',
         'vertical-align': 'middle',
       },
     }),
+    presetApplet(),
+    presetRemRpx(),
+    presetAttributify(),
     presetAno(),
   ],
   transformers: [
+    transformerDirectives(),
+    transformerVariantGroup(),
+    transformerAttributify(),
     transformerApplet(),
   ],
 })

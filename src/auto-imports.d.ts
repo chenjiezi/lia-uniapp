@@ -86,6 +86,7 @@ declare global {
   const useAppStore: typeof import('./stores/app')['useAppStore']
   const useAppStoreWidthOut: typeof import('./stores/app')['useAppStoreWidthOut']
   const useAttrs: typeof import('vue')['useAttrs']
+  const useBlueTooth: typeof import('./composables/useBlueTooth')['default']
   const useCssModule: typeof import('vue')['useCssModule']
   const useCssVars: typeof import('vue')['useCssVars']
   const useSlots: typeof import('vue')['useSlots']
@@ -185,6 +186,7 @@ declare module 'vue' {
     readonly useAppStore: UnwrapRef<typeof import('./stores/app')['useAppStore']>
     readonly useAppStoreWidthOut: UnwrapRef<typeof import('./stores/app')['useAppStoreWidthOut']>
     readonly useAttrs: UnwrapRef<typeof import('vue')['useAttrs']>
+    readonly useBlueTooth: UnwrapRef<typeof import('./composables/useBlueTooth')['default']>
     readonly useCssModule: UnwrapRef<typeof import('vue')['useCssModule']>
     readonly useCssVars: UnwrapRef<typeof import('vue')['useCssVars']>
     readonly useSlots: UnwrapRef<typeof import('vue')['useSlots']>
