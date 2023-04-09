@@ -20,6 +20,7 @@ const {
   closeBluetoothAdapter,
   getBluetoothDevices,
   getConnectedBluetoothDevices,
+  ab2hex,
 } = useBlueTooth(showToast)
 
 // 寻找周边的新设备
@@ -43,13 +44,22 @@ onBluetoothAdapterStateChange((res) => {
 function getBTDevices() {
   getBluetoothDevices((res) => {
     console.log('获取已发现的蓝牙设备=>', res)
+    res.devices.forEach((item: Device) => {
+      if (item.advertisData) {
+        const hex = ab2hex(item.advertisData)
+        console.log('hex=>', hex)
+      }
+      if (item.advertisServiceUUIDs)
+        console.log('advertisServiceUUIDs=>', item.advertisServiceUUIDs)
+    })
   })
 }
 
 // 根据 uuid 获取处于已连接状态的设备
 function getConnectedBTDevices() {
   // TODO: 蓝牙设备的 uuid 怎么获取
-  getConnectedBluetoothDevices(['02058425-520C-0407-3C7E-ABC27D664B24'])
+  getConnectedBluetoothDevices(['0000FF'])
+  // getConnectedBluetoothDevices([])
 }
 </script>
 

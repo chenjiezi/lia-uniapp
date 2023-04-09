@@ -119,6 +119,17 @@ const useBluetooth = (showToast) => {
     })
   }
 
+  // ArrayBuffer转16进度字符串
+  const ab2hex = (buffer) => {
+    const hexArr = Array.prototype.map.call(
+      new Uint8Array(buffer),
+      (bit) => {
+        return (`00${bit.toString(16)}`).slice(-2)
+      },
+    )
+    return hexArr.join('')
+  }
+
   return {
     deviceList,
     openBlueToothAdapter,
@@ -130,6 +141,7 @@ const useBluetooth = (showToast) => {
     onBluetoothAdapterStateChange,
     closeBluetoothAdapter,
     getBluetoothAdapterState,
+    ab2hex,
   }
 }
 
