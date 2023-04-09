@@ -16,6 +16,9 @@ import {
 import { presetAno } from 'ano-ui'
 
 export default defineConfig({
+  shortcuts: {
+    btn: 'block bg-gradient-to-r from-indigo-500 to-pink-500 border-none mb-24rpx',
+  },
   presets: [
     presetIcons({
       warn: true,

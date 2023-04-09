@@ -1,16 +1,16 @@
 /* eslint-disable no-console */
 import type { Device } from '~/utils/types'
 
-const normalCallback = (showToast) => {
+const commonCb = (showToast) => {
   // 成功回调
   const success = (res) => {
     console.log(res)
-    showToast({ position: 'default', duration: 3000, message: `${res.errMsg}` })
+    showToast && showToast({ position: 'default', duration: 3000, message: `${res.errMsg}` })
   }
   // 失败回调
   const fail = (err) => {
     console.log(err)
-    showToast({ position: 'default', duration: 3000, message: err.errMsg })
+    showToast && showToast({ position: 'default', duration: 3000, message: err.errMsg })
   }
   // 完成回调
   const complete = () => {
@@ -19,7 +19,7 @@ const normalCallback = (showToast) => {
   // 蓝牙适配器状态回调
   const successForBluetoothAdapterState = (res) => {
     console.log(res)
-    showToast({ position: 'default', duration: 3000, message: `本机蓝牙适配器${res.available ? '可用' : '不可用'}${res.discovering ? '，正在搜索设备' : ''}.` })
+    showToast && showToast({ position: 'default', duration: 3000, message: `本机蓝牙适配器${res.available ? '可用' : '不可用'}${res.discovering ? '，正在搜索设备' : ''}.` })
   }
   return {
     success,
@@ -32,10 +32,10 @@ const normalCallback = (showToast) => {
 const useBluetooth = (showToast) => {
   const deviceList: Ref<Device[]> = ref([])
 
-  const { success, fail, complete, successForBluetoothAdapterState } = normalCallback(showToast)
+  const { success, fail, complete, successForBluetoothAdapterState } = commonCb(showToast)
 
   // 开启蓝牙适配器
-  const initBlueTooth = () => {
+  const openBlueToothAdapter = () => {
     uni.showLoading({ title: '加载中' })
     uni.openBluetoothAdapter({
       success,
@@ -103,8 +103,10 @@ const useBluetooth = (showToast) => {
   }
 
   // 监听蓝牙适配器状态变化
-  const onBluetoothAdapterStateChange = () => {
-    uni.onBluetoothAdapterStateChange(successForBluetoothAdapterState)
+  const onBluetoothAdapterStateChange = (fn) => {
+    uni.onBluetoothAdapterStateChange((res) => {
+      fn(res)
+    })
   }
 
   // 关闭蓝牙模块
@@ -119,7 +121,7 @@ const useBluetooth = (showToast) => {
 
   return {
     deviceList,
-    initBlueTooth,
+    openBlueToothAdapter,
     startDeviceDiscovery,
     onNewDeviceFound,
     stopDeviceDiscovery,
