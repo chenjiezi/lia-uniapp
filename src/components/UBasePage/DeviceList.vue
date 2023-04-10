@@ -8,21 +8,18 @@ defineProps({
 
 <template>
   <div>
-    <div class="grid grid-cols-[35%_30%_15%_20%]">
+    <div class="grid grid-cols-[45%_35%_20%]">
       <div>设备ID</div>
       <div>名称</div>
       <div justify-self-center>
-        可连接
-      </div>
-      <div justify-self-center>
-        信号强度
+        操作
       </div>
     </div>
     <div h-400rpx overflow-y-auto>
       <div
         v-for="item in deviceList"
         :key="item.deviceId"
-        class="grid my-2 grid-cols-[35%_30%_15%_20%]"
+        class="grid my-2 grid-cols-[45%_35%_20%] items-center bg-gray-200 py-10rpx"
       >
         <div truncate>
           {{ item.deviceId }}
@@ -31,10 +28,9 @@ defineProps({
           {{ item.name }}
         </div>
         <div justify-self-center>
-          {{ item.connectable ? '是' : '否' }}
-        </div>
-        <div justify-self-center>
-          {{ item.RSSI }}
+          <AButton :disabled="!item.connectable" size="mini" @click="$emit('connect', item.deviceId)">
+            连接
+          </AButton>
         </div>
       </div>
     </div>

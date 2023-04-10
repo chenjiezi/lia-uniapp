@@ -21,6 +21,8 @@ const {
   getBluetoothDevices,
   getConnectedBluetoothDevices,
   ab2hex,
+  connectBluetoothDevice,
+  getBLEDeviceServices,
 } = useBlueTooth(showToast)
 
 // 寻找周边的新设备
@@ -61,6 +63,15 @@ function getConnectedBTDevices() {
   getConnectedBluetoothDevices(['0000FF'])
   // getConnectedBluetoothDevices([])
 }
+
+// 处理连接操作
+async function handleConnect(deviceId: string) {
+  // 创建连接
+  await connectBluetoothDevice(deviceId)
+  // 获取服务
+  const services = await getBLEDeviceServices(deviceId)
+  console.log('services=>', services)
+}
 </script>
 
 <template>
@@ -71,7 +82,7 @@ function getConnectedBTDevices() {
         :cc="['btn']"
         @click="openBlueToothAdapter"
       >
-        开启蓝牙模块初
+        开启蓝牙模块
       </AButton>
       <AButton
         :cc="['btn']"
@@ -86,7 +97,7 @@ function getConnectedBTDevices() {
         停止搜索周边蓝牙设备
       </AButton>
       <!-- 蓝牙设备列表 -->
-      <DeviceList :device-list="deviceList" />
+      <DeviceList :device-list="deviceList" @connect="handleConnect" />
       <AButton
         :cc="['btn']"
         @click="getBluetoothAdapterState"

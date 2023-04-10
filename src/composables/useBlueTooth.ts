@@ -29,8 +29,11 @@ const commonCb = (showToast) => {
   }
 }
 
-const useBluetooth = (showToast) => {
-  const deviceList: Ref<Device[]> = ref([])
+const useBluetooth = (showToast?) => {
+  const deviceList: Ref<Device[]> = ref([
+    { deviceId: '123', name: '123', connectable: true },
+    { deviceId: '123123', name: '1223', connectable: false },
+  ])
 
   const { success, fail, complete, successForBluetoothAdapterState } = commonCb(showToast)
 
@@ -119,6 +122,48 @@ const useBluetooth = (showToast) => {
     })
   }
 
+  // 连接蓝牙外围设备
+  const connectBluetoothDevice = (deviceId) => {
+    if (!deviceId)
+      return Promise.reject(new Error('deviceId不能为空'))
+    return new Promise((resolve, reject) => {
+      uni.showLoading({ title: '加载中' })
+      uni.createBLEConnection({
+        deviceId,
+        success: (res) => {
+          resolve(res)
+          showToast && showToast({ position: 'default', duration: 3000, message: `${res.errMsg}` })
+        },
+        fail: (err) => {
+          reject(new Error('请求失败'))
+          showToast && showToast({ position: 'default', duration: 3000, message: err.errMsg })
+        },
+        complete,
+      })
+    })
+  }
+
+  // 获取蓝牙外围设备的服务
+  const getBLEDeviceServices = (deviceId) => {
+    if (!deviceId)
+      return Promise.reject(new Error('deviceId不能为空'))
+    return new Promise((resolve, reject) => {
+      uni.showLoading({ title: '加载中' })
+      uni.getBLEDeviceServices({
+        deviceId,
+        timeout: 5000,
+        success: (res) => {
+          resolve(res)
+        },
+        fail: (err) => {
+          reject(new Error('请求失败'))
+          showToast && showToast({ position: 'default', duration: 3000, message: err.errMsg })
+        },
+        complete,
+      })
+    })
+  }
+
   // ArrayBuffer转16进度字符串
   const ab2hex = (buffer) => {
     const hexArr = Array.prototype.map.call(
@@ -142,6 +187,8 @@ const useBluetooth = (showToast) => {
     closeBluetoothAdapter,
     getBluetoothAdapterState,
     ab2hex,
+    connectBluetoothDevice,
+    getBLEDeviceServices,
   }
 }
 

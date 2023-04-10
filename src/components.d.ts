@@ -14,5 +14,6 @@ declare module '@vue/runtime-core' {
     AToast: typeof import('ano-ui/components/AToast/AToast.vue')['default']
     DeviceList: typeof import('./components/UBasePage/DeviceList.vue')['default']
     UBasePage: typeof import('./components/UBasePage/UBasePage.vue')['default']
+    UniTransition: typeof import('ano-ui/components/UniTransition/UniTransition.vue')['default']
   }
 }
