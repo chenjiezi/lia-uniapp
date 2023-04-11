@@ -11,6 +11,7 @@ const showToast = (options: ToastOptions) => {
 
 const {
   deviceList,
+  deviceInfo,
   openBlueToothAdapter,
   startDeviceDiscovery,
   stopDeviceDiscovery,
@@ -23,6 +24,8 @@ const {
   ab2hex,
   connectBluetoothDevice,
   getBLEDeviceServices,
+  readCharacteristic,
+  writeCharacteristic,
 } = useBlueTooth(showToast)
 
 // 寻找周边的新设备
@@ -59,18 +62,34 @@ function getBTDevices() {
 
 // 根据 uuid 获取处于已连接状态的设备
 function getConnectedBTDevices() {
-  // TODO: 蓝牙设备的 uuid 怎么获取
   getConnectedBluetoothDevices(['0000FF'])
-  // getConnectedBluetoothDevices([])
 }
 
 // 处理连接操作
-async function handleConnect(deviceId: string) {
+async function handleConnect(device: Device) {
   // 创建连接
-  await connectBluetoothDevice(deviceId)
-  // 获取服务
-  const services = await getBLEDeviceServices(deviceId)
-  console.log('services=>', services)
+  await connectBluetoothDevice(device.deviceId)
+  deviceInfo.value.name = device.name
+  deviceInfo.value.deviceId = device.deviceId
+  // 获取服务 TODO: ts
+  const res: any = await getBLEDeviceServices(device.deviceId)
+  deviceInfo.value.services = res.services
+}
+
+// 获取特征值
+async function getCharacteristic(service) {
+  const res: any = await readCharacteristic(deviceInfo.value.deviceId, service.uuid)
+  console.log('发送指令=>', res)
+  service.characteristics = res.characteristics
+  console.log('deviceInfo.value=>', deviceInfo.value)
+}
+
+// 发送指令给特征值
+async function sendOrder(service, characteristics, order) {
+  const buffer = new ArrayBuffer(1)
+  const dataView = new DataView(buffer)
+  dataView.setUint8(0, order)
+  writeCharacteristic(deviceInfo.value.deviceId, service.uuid, characteristics.uuid, buffer)
 }
 </script>
 
@@ -98,7 +117,36 @@ async function handleConnect(deviceId: string) {
       </AButton>
       <!-- 蓝牙设备列表 -->
       <DeviceList :device-list="deviceList" @connect="handleConnect" />
-      <AButton
+      <!-- 已连接设备 -->
+      <view v-if="deviceInfo.deviceId">
+        <view>已连接蓝牙设备：{{ deviceInfo.name }}</view>
+        <view>服务列表：</view>
+        <view v-for="item of deviceInfo.services" :key="item.uuid">
+          <view>
+            <view class="p-20rpx bg-gray-800 text-white">
+              {{ item.uuid }}
+            </view>
+            <AButton size="mini" type="success" :cc="['m-20rpx']" @click="getCharacteristic(item)">
+              获取特征值
+            </AButton>
+            <view>特征值列表：</view>
+            <view v-for="c in item.characteristics" :key="c.uuid" class="mb-10rpx">
+              <view class="p-20rpx bg-white ">
+                {{ c.uuid }}
+              </view>
+              <view v-if="c.properties.write" class="flex">
+                <AButton size="mini" type="success" :cc="['m-20rpx']" @click="sendOrder(item, c, 1)">
+                  开灯
+                </AButton>
+                <AButton size="mini" type="success" :cc="['m-20rpx']" @click="sendOrder(item, c, 2)">
+                  关灯
+                </AButton>
+              </view>
+            </view>
+          </view>
+        </view>
+      </view>
+      <!-- <AButton
         :cc="['btn']"
         @click="getBluetoothAdapterState"
       >
@@ -115,7 +163,7 @@ async function handleConnect(deviceId: string) {
         @click="getConnectedBTDevices"
       >
         获取处于已连接状态的设备
-      </AButton>
+      </AButton> -->
       <AButton
         :cc="['btn']"
         @click="closeBluetoothAdapter"

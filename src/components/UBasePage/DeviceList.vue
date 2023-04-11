@@ -15,7 +15,7 @@ defineProps({
         操作
       </div>
     </div>
-    <div h-400rpx overflow-y-auto>
+    <div h-500rpx overflow-y-auto>
       <div
         v-for="item in deviceList"
         :key="item.deviceId"
@@ -28,7 +28,7 @@ defineProps({
           {{ item.name }}
         </div>
         <div justify-self-center>
-          <AButton :disabled="!item.connectable" size="mini" @click="$emit('connect', item.deviceId)">
+          <AButton :disabled="!item.connectable" size="mini" @click="$emit('connect', item)">
             连接
           </AButton>
         </div>

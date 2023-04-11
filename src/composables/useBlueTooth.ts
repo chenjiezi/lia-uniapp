@@ -29,11 +29,33 @@ const commonCb = (showToast) => {
   }
 }
 
+interface DeviceInfo {
+  name?: string
+  deviceId?: string
+  services?: Array<Service>
+}
+
+interface Service {
+  isPrimary: boolean
+  uuid: string
+  characteristics: Array<Characteristic>
+}
+
+interface Characteristic {
+  uuid: string
+  properties: Properties
+  order: string
+}
+
+interface Properties {
+  read: boolean
+  write: boolean
+  notify: boolean
+}
+
 const useBluetooth = (showToast?) => {
-  const deviceList: Ref<Device[]> = ref([
-    { deviceId: '123', name: '123', connectable: true },
-    { deviceId: '123123', name: '1223', connectable: false },
-  ])
+  const deviceList: Ref<Device[]> = ref([])
+  const deviceInfo: Ref<DeviceInfo> = ref({})
 
   const { success, fail, complete, successForBluetoothAdapterState } = commonCb(showToast)
 
@@ -164,6 +186,56 @@ const useBluetooth = (showToast?) => {
     })
   }
 
+  // 读取服务的特征值
+  const readCharacteristic = (deviceId, serviceId) => {
+    if (!deviceId)
+      return Promise.reject(new Error('deviceId不能为空'))
+    if (!serviceId)
+      return Promise.reject(new Error('serviceId不能为空'))
+    return new Promise((resolve, reject) => {
+      uni.showLoading({ title: '加载中' })
+      uni.getBLEDeviceCharacteristics({
+        deviceId,
+        serviceId,
+        success: (res) => {
+          resolve(res)
+        },
+        fail: (err) => {
+          reject(new Error('请求失败'))
+          showToast && showToast({ position: 'default', duration: 3000, message: err.errMsg })
+        },
+        complete,
+      })
+    })
+  }
+
+  // 向低功耗蓝牙设备特征值中写入二进制数据
+  const writeCharacteristic = (deviceId, serviceId, characteristicId, data) => {
+    if (!deviceId)
+      return Promise.reject(new Error('deviceId不能为空'))
+    if (!serviceId)
+      return Promise.reject(new Error('serviceId不能为空'))
+    if (!characteristicId)
+      return Promise.reject(new Error('characteristicId不能为空'))
+    return new Promise((resolve, reject) => {
+      uni.showLoading({ title: '加载中' })
+      uni.writeBLECharacteristicValue({
+        deviceId,
+        serviceId,
+        characteristicId,
+        value: data,
+        success: (res) => {
+          resolve(res)
+        },
+        fail: (err) => {
+          reject(new Error('请求失败'))
+          showToast && showToast({ position: 'default', duration: 3000, message: err.errMsg })
+        },
+        complete,
+      })
+    })
+  }
+
   // ArrayBuffer转16进度字符串
   const ab2hex = (buffer) => {
     const hexArr = Array.prototype.map.call(
@@ -177,6 +249,7 @@ const useBluetooth = (showToast?) => {
 
   return {
     deviceList,
+    deviceInfo,
     openBlueToothAdapter,
     startDeviceDiscovery,
     onNewDeviceFound,
@@ -189,6 +262,8 @@ const useBluetooth = (showToast?) => {
     ab2hex,
     connectBluetoothDevice,
     getBLEDeviceServices,
+    readCharacteristic,
+    writeCharacteristic,
   }
 }
 
