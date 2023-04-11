@@ -138,7 +138,10 @@ const useBluetooth = (showToast?) => {
   const closeBluetoothAdapter = () => {
     uni.showLoading({ title: '加载中' })
     uni.closeBluetoothAdapter({
-      success,
+      success: (res) => {
+        clear()
+        showToast && showToast({ position: 'default', duration: 3000, message: `${res.errMsg}` })
+      },
       fail,
       complete,
     })
@@ -236,6 +239,28 @@ const useBluetooth = (showToast?) => {
     })
   }
 
+  // 关闭蓝牙设备连接
+  const closeBluetoothDevice = (deviceId) => {
+    if (!deviceId)
+      return Promise.reject(new Error('deviceId不能为空'))
+    return new Promise((resolve, reject) => {
+      uni.showLoading({ title: '加载中' })
+      uni.closeBLEConnection({
+        deviceId,
+        success: (res) => {
+          clearDeviceInfo()
+          resolve(res)
+          console.log('resolve')
+        },
+        fail: (err) => {
+          reject(new Error('请求失败'))
+          showToast && showToast({ position: 'default', duration: 3000, message: err.errMsg })
+        },
+        complete,
+      })
+    })
+  }
+
   // ArrayBuffer转16进度字符串
   const ab2hex = (buffer) => {
     const hexArr = Array.prototype.map.call(
@@ -245,6 +270,15 @@ const useBluetooth = (showToast?) => {
       },
     )
     return hexArr.join('')
+  }
+
+  function clearDeviceInfo() {
+    deviceInfo.value = {}
+  }
+
+  function clear() {
+    deviceList.value = []
+    deviceInfo.value = {}
   }
 
   return {
@@ -264,6 +298,7 @@ const useBluetooth = (showToast?) => {
     getBLEDeviceServices,
     readCharacteristic,
     writeCharacteristic,
+    closeBluetoothDevice,
   }
 }
 

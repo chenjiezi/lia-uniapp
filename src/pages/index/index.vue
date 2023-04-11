@@ -26,6 +26,7 @@ const {
   getBLEDeviceServices,
   readCharacteristic,
   writeCharacteristic,
+  closeBluetoothDevice,
 } = useBlueTooth(showToast)
 
 // 寻找周边的新设备
@@ -91,6 +92,11 @@ async function sendOrder(service, characteristics, order) {
   dataView.setUint8(0, order)
   writeCharacteristic(deviceInfo.value.deviceId, service.uuid, characteristics.uuid, buffer)
 }
+
+// 蓝牙设备断开连接
+async function close(deviceId) {
+  await closeBluetoothDevice(deviceId)
+}
 </script>
 
 <template>
@@ -119,7 +125,12 @@ async function sendOrder(service, characteristics, order) {
       <DeviceList :device-list="deviceList" @connect="handleConnect" />
       <!-- 已连接设备 -->
       <view v-if="deviceInfo.deviceId">
-        <view>已连接蓝牙设备：{{ deviceInfo.name }}</view>
+        <view class="flex items-center">
+          <view>已连接蓝牙设备：{{ deviceInfo.name }}</view>
+          <AButton size="mini" type="info" :cc="['m-20rpx']" @click="close(deviceInfo.deviceId)">
+            断开连接
+          </AButton>
+        </view>
         <view>服务列表：</view>
         <view v-for="item of deviceInfo.services" :key="item.uuid">
           <view>
